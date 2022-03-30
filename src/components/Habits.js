@@ -1,10 +1,54 @@
-import { useState } from "react"
+import { useState, useEffect, useContext } from "react"
+import { ThreeDots } from  'react-loader-spinner'
+import axios from 'axios'
 
 import styled from 'styled-components'
+import UserContext from "../contexts/UserContext"
 
 export default function Habits() {
-    const [add, setAdd] = useState(false)
-    const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+    const {user} = useContext(UserContext)
+
+    const [days, setDays] = useState([]) // array of selected days
+    const [name, setName] = useState('') // name of the new habit
+    const [add, setAdd] = useState(false) // show "Add Habit" section 
+    const [allHabits, setAllHabits] = useState([]) // get all habits from API
+    const [refreshAxios, setRefreshAxios] = useState(false) // refresh axios.get when a new habit is added
+    
+    const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'] // day buttons
+    const config = {Authorization: `Bearer ${user.token}`} // Authorization for axios
+
+    useEffect(() => {
+        const promise = axios.get('https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits',
+        {headers: config})
+        promise.then(response => setAllHabits(response.data))
+        promise.catch(error => console.log(error.response))
+    }, [refreshAxios])
+
+    function ShowHabits({id, name, days}) {
+        return (
+            <Habit>
+                <ion-icon name="trash-outline" onClick={() => deleteHabit(id)}></ion-icon>
+                <p>{name}</p>
+                <div className='Days'>
+                    {dayNames.map((day, i) => 
+                        <button key={`${day} - ${i}`} className={days.includes(i) ? 'selected' : ''}>{day}</button>
+                    )}   
+                </div>
+            </Habit>
+        )
+    }
+
+    function deleteHabit(id) {
+        let confirmation = window.confirm('Do you really want to delete this habit?')
+        if (confirmation) {
+            const promise = axios.delete(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}`,
+            {headers: config})
+            promise.then(reponse => {
+                setRefreshAxios(!refreshAxios)
+            })
+            promise.catch(error => console.log(error.response))
+        }
+    }
 
     return (
         <Main>
@@ -12,34 +56,120 @@ export default function Habits() {
                 <p>My habits</p>
                 <button onClick={() => setAdd(true)}><ion-icon name="add-outline"></ion-icon></button>
             </Wrapper>
+
             {add ? 
-            <AddHabit>
-                <input type='text' placeholder='habit name'/>
-                <div className='Days'>
-                    {days.map((day, i) => <button key={`${day} - ${i}`}>{day}</button>)}   
-                </div>
-                <div className='FinishHabit'>
-                    <p onClick={() => setAdd(false)}>Cancel</p>
-                    <button>Save</button>
-                </div>
-            </AddHabit> : 
+            <Add dayNames={dayNames} setAdd={setAdd} token={user.token}
+            days={days} setDays={setDays} name={name} setName={setName} 
+            refreshAxios={refreshAxios} setRefreshAxios={setRefreshAxios} /> : 
             <></>}
-            <Habit>
-                <ion-icon name="trash-outline"></ion-icon>
-                <p>Ler 1 capítulo de livro</p>
-                <div className='Days'>
-                    {days.map((day, i) => <button key={`${day} - ${i}`}>{day}</button>)}   
-                </div>
-            </Habit>
-            <Text>You don't have any habit yet. Add a habit to start the traking!</Text>
+
+            {allHabits.map( ({id, name, days}) => {return(
+                <ShowHabits key={id} id={id} name={name} days={days} />
+            )})}
+
+            {allHabits.length === 0 ? 
+            <Text>You don't have any habit yet. Add a habit to start the traking!</Text> : 
+            <></>}
         </Main>
     )
 }
 
+function Add(props) {
+    const {days, setDays, name, setName, dayNames, setAdd, token, refreshAxios, setRefreshAxios} = props
+
+    const [notValid, setNotValid] = useState(true) // validate 'days' and 'name'
+    const [loading, setLoading] = useState(false) // loading API
+
+    function validateObj() {
+        if (days.length > 0 && name.length > 2) {
+            setNotValid(false)
+        } else {
+            setNotValid(true)
+        }
+    }
+    useEffect(validateObj, [days, name])
+
+    function attDays(index) {
+        if (days.includes(index)) {
+            const i = days.indexOf(index)
+            days.splice(i, 1)
+            setDays([...days].sort( (a, b) => {return a - b} ))
+        } else {
+            setDays([...days, index].sort( (a, b) => {return a - b} ))
+        }
+    }
+
+    function addHabit(e) {
+        e.preventDefault()
+        setLoading(true)
+
+        const config = {Authorization: `Bearer ${token}`}
+        
+        const promise = axios.post('https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits', {
+            name,
+            days
+        }, {headers: config})
+        promise.then(response => {
+            setAdd(false)
+            setDays([])
+            setName('')
+            setRefreshAxios(!refreshAxios)
+        })
+        promise.catch(error => {
+            console.log(error.response)
+            alert(`Error type "${error.response.statusText}"`)
+            setLoading(false)
+        })
+    }
+
+    let loadingAnimation = <ThreeDots color="#FFFFFF" height={35} width={45} />
+    return (
+        <AddHabit>
+            <form onSubmit={e => addHabit(e)}>
+                <input 
+                    type='text' 
+                    placeholder='habit name' 
+                    className={loading ? 'loading' : ''}
+                    disabled={loading ? true : false} 
+                    value={name} 
+                    onChange={e => setName(e.target.value)} 
+                    required
+                />
+                <div className='Days'>
+                    {dayNames.map((day, i) => 
+                        <button 
+                            key={`${day} - ${i}`} 
+                            type='button'
+                            className={days.includes(i) ? 'selected' : ''}
+                            disabled={loading ? true : false}
+                            style={loading ? {cursor: 'auto'} : {cursor: 'pointer'}}
+                            onClick={() => attDays(i)}
+                        >{day}</button>
+                    )}   
+                </div>
+                <div className='FinishHabit'>
+                    <p 
+                        onClick={loading ? null : () => setAdd(false)}
+                        className={loading ? 'loading' : ''}
+                        style={loading ? {cursor: 'auto'} : {cursor: 'pointer'}}
+                    >Cancel</p>
+                    <button 
+                        type="submit" 
+                        className={(notValid || loading) ? 'loading' : ''}
+                        disabled={(notValid || loading) ? true : false}
+                        style={(notValid || loading) ? {cursor: 'auto'} : {cursor: 'pointer'}}
+                    >{loading ? loadingAnimation : 'Save'}</button>
+                </div>
+            </form>
+        </AddHabit>
+    )
+}
+
+
 // STYLED COMPONENTS
 const Main = styled.main`
     width: 90%;
-    margin: 92px auto 120px;
+    margin: 92px auto 100px;
 
     display: flex;
     flex-direction: column;
@@ -129,6 +259,11 @@ const AddHabit = styled.article`
             border: 1px solid var(--input--placeholder);
             background: #FFFFFF;
         }
+        button.selected {
+            color: #FFFFFF;
+            border: none;
+            background: #CFCFCF;
+        }
     }
 
     .FinishHabit {
@@ -141,23 +276,31 @@ const AddHabit = styled.article`
 
         * {
             font-size: 16px;
-            cursor: pointer;
         }
 
         p {
             color: var(--theme--color);
             margin-right: 23px;
         }
+        p.loading {
+            opacity: 0.7;
+        }
 
         button {
             width: 84px;
             height: 35px;
 
-            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
+            color: #FFFFFF;
             border: none;
             border-radius: 5px;
             background-color: var(--theme--color);
+        }
+        button.loading {
+            opacity: 0.7;
         }
     }
 `
@@ -195,11 +338,15 @@ const Habit = styled.article`
 
         font-size: 20px;
         color: var(--input--placeholder);
-        cursor: pointer;
 
         border-radius: 5px;
         border: 1px solid var(--input--placeholder);
         background: #FFFFFF;
+    }
+    button.selected {
+        color: #FFFFFF;
+        border: none;
+        background: #CFCFCF;
     }
 `
 

@@ -38,8 +38,9 @@ export default function Menu() {
 // STYLED COMPONENTS
 const Footer = styled.footer`
     height: 70px;
-    background-color: #FFFFFF;
     padding: 0 36px;
+    background-color: #FFFFFF;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.15);
 
     display: flex;
     align-items: center;
