@@ -71,6 +71,8 @@ const Main = styled.main`
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100vh;
+    background-color: #FFFFFF;
 
     img {
         width: 154px;
@@ -80,7 +82,7 @@ const Main = styled.main`
     h1 {
         font-family: 'Playball', cursive;
         font-size: 70px;
-        color: #126BA5;
+        color: var(--theme--color--dark);
     }
 
     form {
@@ -103,11 +105,11 @@ const Main = styled.main`
     }
 
     input.loading {
-        background-color: #F2F2F2;
+        background-color: var(--input--loading);
     }
 
     input::placeholder {
-        color: #DBDBDB;
+        color: var(--input--placeholder);
     }
 
     button {
@@ -119,7 +121,7 @@ const Main = styled.main`
 
         border: none;
         border-radius: 5px;
-        background-color: #52B6FF;
+        background-color: var(--theme--color);
 
         font-size: 20px;
         color: #FFFFFF;
@@ -133,11 +135,16 @@ const Main = styled.main`
         margin-top: 15px;
         font-size: 24px;
         font-weight: 500;
-        color: #FB6B6B;
+        color: var(--error);
     }
 ` 
 const StyledLink = styled(Link)`
-    color: #52B6FF;
+    color: var(--theme--color);
     margin-top: 25px;
     font-size: 14px;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 `

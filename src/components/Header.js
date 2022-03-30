@@ -1,25 +1,28 @@
-import styled from 'styled-components'
 import { useLocation } from 'react-router-dom'
+import { useContext } from 'react'
 
-import Bunny from './../assets/Images/Bunny.jpg'
+import styled from 'styled-components'
+import UserContext from '../contexts/UserContext'
 
 export default function Header() {
+    const {user} = useContext(UserContext)
     const {pathname} = useLocation()
 
     return (pathname !== '/' && pathname !== '/signin')  ? (
         <Top>
             <h1>TrackIt</h1>
-            <img src={Bunny} alt='Profile' />
+            <img src={user.image} alt='Profile' />
         </Top>
     ) : (
         <></>
     )
 }
 
+// STYLED COMPONENTS
 const Top = styled.header`
     height: 70px;
     padding: 0 18px;
-    background-color: #126BA5;
+    background-color: var(--theme--color--dark);
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
 
     position: fixed;

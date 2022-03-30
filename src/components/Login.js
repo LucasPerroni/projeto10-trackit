@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ThreeDots } from  'react-loader-spinner'
 import axios from 'axios'
 
 import styled from 'styled-components'
 import Logo from './../assets/Images/Logo.jpg'
+import UserContext from '../contexts/UserContext'
 
 export default function Login() {
+    const {setUser} = useContext(UserContext)
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false) // Loading API or not
     const [valid, setValid] = useState(true) // API post status
@@ -24,7 +26,10 @@ export default function Login() {
             email: event.target[0].value,
             password: event.target[1].value
         })
-        promise.then(response => navigate('/today', {state: response.data}))
+        promise.then(response => {
+            setUser(response.data)
+            navigate('/today')
+        })
         promise.catch(error => {
             console.log(error.response)
             setLoading(false)
@@ -67,6 +72,8 @@ const Main = styled.main`
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100vh;
+    background-color: #FFFFFF;
 
     img {
         width: 154px;
@@ -76,7 +83,7 @@ const Main = styled.main`
     h1 {
         font-family: 'Playball', cursive;
         font-size: 70px;
-        color: #126BA5;
+        color: var(--theme--color--dark);
     }
 
     form {
@@ -99,11 +106,11 @@ const Main = styled.main`
     }
     
     input.loading {
-        background-color: #F2F2F2;
+        background-color: var(--input--loading);
     }
 
     input::placeholder {
-        color: #DBDBDB;
+        color: var(--input--placeholder);
     }
 
     button {
@@ -115,7 +122,7 @@ const Main = styled.main`
 
         border: none;
         border-radius: 5px;
-        background-color: #52B6FF;
+        background-color: var(--theme--color);
 
         font-size: 20px;
         color: #FFFFFF;
@@ -129,11 +136,16 @@ const Main = styled.main`
         margin-top: 15px;
         font-size: 24px;
         font-weight: 500;
-        color: #FB6B6B;
+        color: var(--error);
     }
 ` 
 const StyledLink = styled(Link)`
-    color: #52B6FF;
+    color: var(--theme--color);
     margin-top: 25px;
     font-size: 14px;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 `
