@@ -5,10 +5,9 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import styled from 'styled-components'
 import 'react-circular-progressbar/dist/styles.css'
 
-export default function Menu() {
+export default function Menu({percentage}) {
     const {pathname} = useLocation()
     const navigate = useNavigate()
-    let percentage = 66
 
     return (pathname !== '/' && pathname !== '/signin') ? (
         <Footer>
@@ -50,6 +49,7 @@ const Footer = styled.footer`
     bottom: 0;
     right: 0;
     left: 0;
+    z-index: 10;
 
     p {
         font-size: 18px;

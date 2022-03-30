@@ -13,6 +13,7 @@ import UserContext from './../contexts/UserContext'
 
 export default function App() {
     const [user, setUser] = useState({})
+    const [percentage, setPercentage] = useState(0)
 
     return (
         <UserContext.Provider value={{user, setUser}}>
@@ -22,11 +23,11 @@ export default function App() {
                     <Route path="/" element={<Login />} />
                     <Route path="/signin" element={<SignIn />} />
                     <Route path="/habits" element={<Habits />} />
-                    <Route path="/today" element={<Today />} />
+                    <Route path="/today" element={<Today attPercentage={p => setPercentage(p)} />} />
                     <Route path="/history" element={<History />} />
                     <Route path='*' element={<p>This page does not exist</p>} />
                 </Routes>
-                <Menu />
+                <Menu percentage={percentage} />
             </BrowserRouter>
         </UserContext.Provider>
     )
