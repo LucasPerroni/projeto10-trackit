@@ -99,7 +99,7 @@ const Main = styled.main`
         padding: 0 11px;
 
         outline: none;
-        border: 1px solid #D5D5D5;
+        border: 1px solid var(--input--placeholder);
         border-radius: 5px;
 
         font-size: 20px;
