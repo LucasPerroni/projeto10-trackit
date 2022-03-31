@@ -73,8 +73,9 @@ const Main = styled.main`
     flex-direction: column;
     align-items: center;
 
-    position: fixed;
-    height: 100vh;
+    overflow-y: auto;
+    position: absolute;
+    height: 100%;
     width: 100%;
     background-color: #FFFFFF;
 
@@ -144,7 +145,7 @@ const Main = styled.main`
 ` 
 const StyledLink = styled(Link)`
     color: var(--theme--color);
-    margin: 25px 0 100px;
+    margin: 25px 0;
     font-size: 14px;
     text-decoration: none;
 

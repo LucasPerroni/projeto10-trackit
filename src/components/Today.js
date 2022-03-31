@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from "react"
+import { ThreeDots } from  'react-loader-spinner'
 import dayjs from 'dayjs'
 import axios from 'axios'
 
@@ -40,12 +41,15 @@ export default function Today() {
     }, [refresh])
 
     function ShowTasks({task}) {
+        const [loading, setLoading] = useState('') // Sending request to API
+
         const {id, name, done, currentSequence:CS, highestSequence:HS} = task
         const URL_CHECK = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}/check`
         const URL_UNCHECK = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}/uncheck`
 
         // Check or uncheck habit in API
         function attConcluded() {
+            setLoading('loading')
             const obj = {id, name, done, currentSequence: CS, highestSequence: HS}
             if (done) {
                 let promise = axios.post(URL_UNCHECK, obj, {headers: config})
@@ -64,16 +68,18 @@ export default function Today() {
             }
         }
 
+        let icon = <ion-icon name="checkmark-sharp"></ion-icon>
+        let loadingAnimation = <ThreeDots color="#FFFFFF" height={69} width={60} />
         return (
             <Task>
                 <h3>{name}</h3>
                 <p>Current sequence: <span className={done ? 'concluded' : ''}>{CS} days</span></p>
-                <p>Your max sequence: <span className={CS === HS ? 'concluded' : ''}>{HS} days</span></p>
+                <p>Your max sequence: <span className={(done && CS === HS) ? 'concluded' : ''}>{HS} days</span></p>
                 <button 
                     onClick={attConcluded}
-                    className={done ? 'concluded' : ''}
+                    className={done ? `concluded ${loading}` : `${loading}`}
                 >
-                    <ion-icon name="checkmark-sharp"></ion-icon>
+                    {loading === '' ? icon : loadingAnimation}
                 </button>
             </Task>
         )
@@ -161,5 +167,8 @@ const Task = styled.article`
     }
     button.concluded {
         background-color: var(--habit--concluded);
+    }
+    button.loading {
+        opacity: 0.7;
     }
 `
