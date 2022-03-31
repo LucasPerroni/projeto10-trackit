@@ -73,8 +73,8 @@ const Main = styled.main`
     flex-direction: column;
     align-items: center;
 
-    position: absolute;
-    height: 100%;
+    position: fixed;
+    height: 100vh;
     width: 100%;
     background-color: #FFFFFF;
 

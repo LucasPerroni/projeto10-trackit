@@ -13,7 +13,12 @@ import UserContext from './../contexts/UserContext'
 import PercentageContext from './../contexts/PercentageContext'
 
 export default function App() {
-    const [user, setUser] = useState({})
+    // Get 'user' obj from localStorage
+    const savedUserString = localStorage.getItem('user')
+    let savedUser = JSON.parse(savedUserString)
+    if (savedUser === null) {savedUser = {}}
+
+    const [user, setUser] = useState(savedUser)
     const [percentage, setPercentage] = useState(0)
 
     return (

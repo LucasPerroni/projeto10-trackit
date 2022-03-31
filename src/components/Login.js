@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ThreeDots } from  'react-loader-spinner'
 import axios from 'axios'
@@ -8,14 +8,25 @@ import Logo from './../assets/Images/Logo.jpg'
 import UserContext from '../contexts/UserContext'
 
 export default function Login() {
-    const {setUser} = useContext(UserContext)
+    const {user, setUser} = useContext(UserContext)
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false) // Loading API or not
     const [valid, setValid] = useState(true) // API post status
-    const inputs = [
+    const inputs = [ // Array with all inputs
         {type: 'email', placeholder: 'email'}, 
         {type: 'password', placeholder: 'password'}
-    ] // Array with all inputs
+    ]
+
+    // Skip the login if 'user' obj already exists
+    function skipLogin() {
+        if (user.name) {
+            const skipLogin = window.confirm(`We already saved "${user.name}" login, do you want to skip the login?`)
+            if (skipLogin) {navigate('/today')}
+        }
+    }
+    useEffect(() => {
+        setTimeout(skipLogin, 500)
+    }, [])
 
     // Post LogIn obj in API
     function submitForm(event) {
@@ -28,6 +39,10 @@ export default function Login() {
         })
         promise.then(response => {
             setUser(response.data)
+
+            const userString = JSON.stringify(response.data)
+            localStorage.setItem('user', userString)
+
             navigate('/today')
         })
         promise.catch(error => {
@@ -73,9 +88,9 @@ const Main = styled.main`
     display: flex;
     flex-direction: column;
     align-items: center;
-    
-    position: absolute;
-    height: 100%;
+
+    position: fixed;
+    height: 100vh;
     width: 100%;
     background-color: #FFFFFF;
 
