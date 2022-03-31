@@ -1,11 +1,14 @@
-// import {useContext} from  'react'
+import {useContext} from  'react'
 import { useLocation, Link, useNavigate } from 'react-router-dom'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 
 import styled from 'styled-components'
 import 'react-circular-progressbar/dist/styles.css'
 
-export default function Menu({percentage}) {
+import PercentageContext from '../contexts/PercentageContext'
+
+export default function Menu() {
+    const {percentage} = useContext(PercentageContext)
     const {pathname} = useLocation()
     const navigate = useNavigate()
 

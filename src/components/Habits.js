@@ -327,6 +327,10 @@ const Habit = styled.article`
     }
 
     p {
+        max-width: 85%;
+        max-height: 20px;
+        overflow: hidden;
+        
         margin: 13px 0;
         color: #666666;
     }

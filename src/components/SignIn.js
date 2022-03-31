@@ -66,6 +66,7 @@ export default function SignIn() {
     )
 }
 
+
 // STYLED COMPONENTS
 const Main = styled.main`
     display: flex;
@@ -143,7 +144,7 @@ const Main = styled.main`
 ` 
 const StyledLink = styled(Link)`
     color: var(--theme--color);
-    margin-top: 25px;
+    margin: 25px 0 100px;
     font-size: 14px;
     text-decoration: none;
 

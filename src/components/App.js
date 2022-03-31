@@ -10,6 +10,7 @@ import History from './History'
 import Menu from './Menu'
 
 import UserContext from './../contexts/UserContext'
+import PercentageContext from './../contexts/PercentageContext'
 
 export default function App() {
     const [user, setUser] = useState({})
@@ -17,18 +18,20 @@ export default function App() {
 
     return (
         <UserContext.Provider value={{user, setUser}}>
-            <BrowserRouter>
-                <Header />
-                <Routes>
-                    <Route path="/" element={<Login />} />
-                    <Route path="/signin" element={<SignIn />} />
-                    <Route path="/habits" element={<Habits />} />
-                    <Route path="/today" element={<Today attPercentage={p => setPercentage(p)} />} />
-                    <Route path="/history" element={<History />} />
-                    <Route path='*' element={<p>This page does not exist</p>} />
-                </Routes>
-                <Menu percentage={percentage} />
-            </BrowserRouter>
+            <PercentageContext.Provider value={{percentage, setPercentage}}>
+                <BrowserRouter>
+                    <Header />
+                    <Routes>
+                        <Route path="/" element={<Login />} />
+                        <Route path="/signin" element={<SignIn />} />
+                        <Route path="/habits" element={<Habits />} />
+                        <Route path="/today" element={<Today />} />
+                        <Route path="/history" element={<History />} />
+                        <Route path='*' element={<p>This page does not exist</p>} />
+                    </Routes>
+                    <Menu />
+                </BrowserRouter>
+            </PercentageContext.Provider>
         </UserContext.Provider>
     )
 }
