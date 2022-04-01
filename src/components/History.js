@@ -1,6 +1,13 @@
+import { useContext, useEffect } from 'react'
+
 import styled from 'styled-components'
+import UserContext from '../contexts/UserContext'
 
 export default function History() {
+    const {getTodayHabits} = useContext(UserContext)
+
+    useEffect(getTodayHabits, [])
+
     return (
         <Main>
             <h1>History</h1>

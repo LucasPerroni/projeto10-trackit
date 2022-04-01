@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import UserContext from "../contexts/UserContext"
 
 export default function Habits() {
-    const {user} = useContext(UserContext)
+    const {user, getTodayHabits} = useContext(UserContext)
 
     const [days, setDays] = useState([]) // array of selected days
     const [name, setName] = useState('') // name of the new habit
@@ -16,6 +16,8 @@ export default function Habits() {
     
     const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'] // day buttons
     const config = {Authorization: `Bearer ${user.token}`} // Authorization for axios
+
+    useEffect(getTodayHabits, [])
 
     useEffect(() => {
         const promise = axios.get('https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits',
@@ -45,6 +47,7 @@ export default function Habits() {
             {headers: config})
             promise.then(reponse => {
                 setRefreshAxios(!refreshAxios)
+                getTodayHabits()
             })
             promise.catch(error => console.log(error.response))
         }
@@ -58,7 +61,7 @@ export default function Habits() {
             </Wrapper>
 
             {add ? 
-            <Add dayNames={dayNames} setAdd={setAdd} token={user.token}
+            <Add dayNames={dayNames} setAdd={setAdd} token={user.token} getTodayHabits={getTodayHabits}
             days={days} setDays={setDays} name={name} setName={setName} 
             refreshAxios={refreshAxios} setRefreshAxios={setRefreshAxios} /> : 
             <></>}
@@ -75,7 +78,7 @@ export default function Habits() {
 }
 
 function Add(props) {
-    const {days, setDays, name, setName, dayNames, setAdd, token, refreshAxios, setRefreshAxios} = props
+    const {days, setDays, name, setName, dayNames, setAdd, token, refreshAxios, setRefreshAxios, getTodayHabits} = props
 
     const [notValid, setNotValid] = useState(true) // validate 'days' and 'name'
     const [loading, setLoading] = useState(false) // loading API
@@ -114,6 +117,7 @@ function Add(props) {
             setDays([])
             setName('')
             setRefreshAxios(!refreshAxios)
+            getTodayHabits()
         })
         promise.catch(error => {
             console.log(error.response)
@@ -253,6 +257,7 @@ const AddHabit = styled.article`
 
             font-size: 20px;
             color: var(--input--placeholder);
+            transition: all 0.5s;
             cursor: pointer;
 
             border-radius: 5px;
@@ -293,6 +298,7 @@ const AddHabit = styled.article`
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.5s;
 
             color: #FFFFFF;
             border: none;
@@ -300,7 +306,7 @@ const AddHabit = styled.article`
             background-color: var(--theme--color);
         }
         button.loading {
-            opacity: 0.7;
+            opacity: 0.5;
         }
     }
 `

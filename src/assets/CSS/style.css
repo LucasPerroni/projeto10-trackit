@@ -1,5 +1,7 @@
 * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    
     --theme--color: #52B6FF;
     --theme--color--dark: #126BA5;
     --error: #FB6B6B;

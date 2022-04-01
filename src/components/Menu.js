@@ -5,13 +5,15 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import styled from 'styled-components'
 import 'react-circular-progressbar/dist/styles.css'
 
-import PercentageContext from '../contexts/PercentageContext'
+import UserContext from '../contexts/UserContext'
 
 export default function Menu() {
-    const {percentage} = useContext(PercentageContext)
+    const {todayHabits} = useContext(UserContext)
     const {pathname} = useLocation()
     const navigate = useNavigate()
 
+    let percentage = todayHabits.length > 0 ? todayHabits.filter(h => h.done).length/todayHabits.length * 100 : 0
+    
     return (pathname !== '/' && pathname !== '/signin') ? (
         <Footer>
             <Link to='/habits' style={{textDecoration: 'none'}}>
