@@ -9,6 +9,8 @@
     --input--loading: #F2F2F2;
     --habit--pending: #BABABA;
     --habit--concluded: #8FC549;
+    --concluded: #8CC654;
+    --not--concluded: #EA5766;
 }
 
 body {

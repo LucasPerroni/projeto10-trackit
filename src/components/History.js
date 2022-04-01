@@ -10,13 +10,16 @@ import UserContext from '../contexts/UserContext'
 export default function History() {
     const {user, getTodayHabits} = useContext(UserContext)
 
-    const [date, setDate] = useState(new Date())
-    const [days, setDays] = useState([])
-    const [dayConcluded, setDayConcluded] = useState([])
-    const [dayNotConcluded, setDayNotConcluded] = useState([])
+    const [date, setDate] = useState(new Date()) // date selected
+    const [days, setDays] = useState([]) // array with all history of user
+    const [dayConcluded, setDayConcluded] = useState([]) // array with days that all habits were concluded
+    const [dayNotConcluded, setDayNotConcluded] = useState([]) // array with days that one or more habits wasn't concluded
+    // obj with all important information for the habits section
+    const [habitsWindow, setHabitsWindow] = useState({show: false, habits: [], day: null}) 
 
-    useEffect(getTodayHabits, [])
+    useEffect(getTodayHabits, []) // update 'todayHabits' array [more info in App.js]
     
+    // get history from API
     useEffect(() => {
         const URL = 'https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/history/daily'
         const config = {Authorization: `Bearer ${user.token}`}
@@ -25,6 +28,7 @@ export default function History() {
         promise.catch(error => console.log(error.response))
     }, [])
 
+    // update 'dayConcluded' and 'dayNotConcluded' arrays when 'day' array changes 
     useEffect(() => {
         const arrayTrue = [] // new array with days concluded 
         const arrayFalse = [] // new array with days not concluded 
@@ -45,6 +49,7 @@ export default function History() {
         })
     }, [days])
 
+    // validate if, in specific day, all habits were concluded or not 
     function validateDay(date, status) {
         if (status) {
             for (let i = 0; i < dayConcluded.length; i++) {
@@ -59,6 +64,19 @@ export default function History() {
                 }
             }
         }
+    }
+
+    // show or hide section with history of the selected day
+    function showHabits(date) {
+        let counter = 0
+        let day = dayjs(date).format('DD/MM/YYYY')
+        days.forEach(habitDay => {
+            if (habitDay.day === day) {
+                setHabitsWindow({show: true, habits: habitDay.habits, day: day})
+                setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 50)
+            } else {counter++}
+        })
+        if (counter === days.length) {setHabitsWindow({show: false})}
     }
 
     return (
@@ -81,8 +99,34 @@ export default function History() {
                         return 'false'
                     }
                 }}
+                onClickDay={date => showHabits(date)}
             />
+            {habitsWindow.show ? 
+            <Habits habits={habitsWindow.habits} day={habitsWindow.day} /> :
+            <></>}
         </Main>
+    )
+}   
+
+function Habits({habits, day}) {
+    function HabitName({name, done}) {
+        return (
+            <div className={done ? 'Concluded' : 'NotConcluded'}>
+                <ion-icon name={done ? 'checkmark-circle' : 'close-circle'}></ion-icon>
+                <p>{name}</p>
+            </div>
+        )
+    }
+
+    return (
+        <Habit>
+            <h1>{day}</h1>
+            <div className='wrapper'>
+                {habits.map( ({name, done}) => {return (
+                    <HabitName key={name} name={name} done={done} />
+                )})}
+            </div>
+        </Habit>
     )
 }
 
@@ -90,17 +134,11 @@ export default function History() {
 // STYLED COMPONENTS
 const Main = styled.main`
     width: 90%;
-    margin: 98px auto 100px;
+    margin: 98px auto 120px;
 
     h1 {
         font-size: 23px;
         color: var(--theme--color--dark);
-    }
-
-    p {
-        font-size: 18px;
-        color: #666666;
-        margin: 15px 0;
     }
 `
 
@@ -114,11 +152,6 @@ const StyledCalendar = styled(Calendar)`
     border: none;
     border-radius: 10px;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.15);
-
-    * {
-        --concluded: #8CC654;
-        --not--concluded: #EA5766;
-    }
 
     // All buttons
     button {
@@ -179,5 +212,51 @@ const StyledCalendar = styled(Calendar)`
     }
     .false {
         background: var(--not--concluded);
+    }
+`
+const Habit = styled.article`
+    width: 80%;
+
+    margin: 15px auto;
+    padding: 15px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    border-radius: 10px;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.15);
+    background-color: #FFFFFF;
+
+    .wrapper {
+        width: 100%;
+
+        div {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+
+            p {
+                max-width: 84%;
+                max-height: 18px;
+
+                overflow: hidden;
+                margin-left: 10px;
+
+                font-size: 18px;
+                color: #666666;
+            }
+
+            ion-icon {
+                font-size: 24px;
+            }
+        }
+    }
+
+    .Concluded {
+        * {color: var(--concluded) !important;}
+    }
+    .NotConcluded {
+        * {color: var(--not--concluded) !important;}
     }
 `
